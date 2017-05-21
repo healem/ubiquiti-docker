@@ -1,9 +1,8 @@
 FROM phusion/baseimage:0.9.19
-MAINTAINER Chad Tindel "chad@tindel.net"
+MAINTAINER Mike Healey "healem@alum.rpi.edu"
 
 # Must be passed in at build time with --build-arg
-ARG UNIFI_VERSION
-ARG UNIFI_DEB_URL
+#ARG UNIFI_VERSION
 
 # We'll run the mongo prune script every day at 2am to minimize
 #  DB Stats to last 14 days.  See crontab addition above
@@ -13,10 +12,10 @@ ADD mongo_prune_js.js /bin
 ADD start.sh /bin
 RUN /bin/chmod +x /bin/start.sh
 
-# We download the exact version of Unifi that we want so that we know our 
+# We download the exact version of Unifi that we want so that we know our
 #  docker tags are correct instead of apt-get update && apt-get -y install unifi
 #
-# We need to run the unifi script once because it sets up all the 
+# We need to run the unifi script once because it sets up all the
 #  /var/lib/unifi and /usr/lib/unifi symlinks for us.  But we don't
 #  want to keep any of that data around, we want our union mount to
 #  replace /var/lib/unifi so we remove a bunch of dirs at the end
@@ -27,13 +26,13 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
     echo "deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list && \
     apt-get update && apt-get install -y mongodb-org && \
     apt-get install -y curl cron procps net-tools vim mongodb-org && \
-    curl -L ${UNIFI_DEB_URL} -o /tmp/unifi.deb && \
+    curl -L http://dl.ubnt.com/unifi/5.4.15/unifi_sysvinit_all.deb -o /tmp/unifi.deb && \
     dpkg -i /tmp/unifi.deb || /bin/true && apt-get -yf --force-yes install && \
     crontab -l | { cat; echo "0 2 * * * mongo --port 27117 < /bin/mongo_prune_js.js"; } | crontab - && \
-    /etc/init.d/unifi start && /etc/init.d/unifi stop && \ 
+    /etc/init.d/unifi start && /etc/init.d/unifi stop && \
     dpkg --purge curl && \
     apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm -rf /var/lib/unifi/* /usr/lib/unifi/{data.,logs.,run.}* 
+    rm -rf /var/lib/unifi/* /usr/lib/unifi/{data.,logs.,run.}*
 
 # No reason to expose the MongoDB port 27117 to the outside for most people
 EXPOSE 8080 8443 8843 8880
