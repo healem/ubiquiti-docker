@@ -2,6 +2,6 @@
 
 # ubiquiti-docker
 
-Docker images to work with Ubiquiti Products on a Synology NAS.
+Docker images to work with Ubiquiti Products on a Synology NAS.  Also works on Ubuntu 16.04.
 
 See Subdirectories for relevant README.
