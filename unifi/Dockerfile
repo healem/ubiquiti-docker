@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.9.19
+FROM phusion/baseimage:0.9.22
 MAINTAINER Mike Healey "healem@alum.rpi.edu"
 
 # Must be passed in at build time with --build-arg
@@ -20,11 +20,11 @@ RUN /bin/chmod +x /bin/start.sh
 #  want to keep any of that data around, we want our union mount to
 #  replace /var/lib/unifi so we remove a bunch of dirs at the end
 RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927 && \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv C0A52C50 && \
-    echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.2.list && \
+	apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 0C49F3730359A14518585931BC711F9BA15703C6 && \
+	echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.4 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.4.list && \
     echo "deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list && \
-    apt-get update && apt-get install -y mongodb-org && \
+    apt-get update && apt-get install -y mongodb-org tzdata && \
     apt-get install -y curl cron procps net-tools vim mongodb-org && \
     curl -L http://dl.ubnt.com/unifi/5.4.15/unifi_sysvinit_all.deb -o /tmp/unifi.deb && \
     dpkg -i /tmp/unifi.deb || /bin/true && apt-get -yf --force-yes install && \

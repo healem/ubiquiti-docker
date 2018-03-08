@@ -29,7 +29,25 @@ if [ ! -f /var/lib/unifi-video/system.properties ]; then
     echo "is_default=true" > /var/lib/unifi-video/system.properties
 fi
 
-# We don't want the process to daemonize because we want it to run forever
-#  as the docker container process
-echo "UFV_DAEMONIZE=false" > /etc/default/unifi-video
-/usr/sbin/unifi-video start
+# check for presence of perms file, if it exists then skip setting
+# permissions, otherwise recursively set on volume mappings for host
+if [[ ! -f "/var/lib/unifi-video/perms.txt" ]]; then
+    echo "About to run 'chown -R unifi-video:unifi-video /var/lib/unifi-video' this could take a while..."
+    chown -R unifi-video:unifi-video /var/lib/unifi-video
+
+    echo "This file prevents permissions from being applied/re-applied to /config, if you want to reset permissions then please delete this file and restart the container." > /var/lib/unifi-video/perms.txt || exit 1
+	chown unifi-video:unifi-video /var/lib/unifi-video/perms.txt || exit 1
+else
+    echo "Ownership permissions already set, no need to chown again"
+fi
+
+mkdir -p /var/lib/unifi-video/logs
+
+#sed -i.bak 's/PKGUSER=.*/PKGUSER=root/g' /usr/sbin/unifi-video
+
+#while true
+#do
+#    echo "Press [CTRL+C] to stop.."
+#    sleep 1
+#done
+/usr/sbin/unifi-video --nodetach --debug --verbose start
