@@ -1,7 +1,7 @@
 [Unit]
 Description=UniFi Video Controller
 Requires=docker.service
-After=docker.service mnt-univid.mount
+After=docker.service mnt-fatboy.mount mnt-univid.mount
 
 [Service]
 Restart=always
