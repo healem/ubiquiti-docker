@@ -26,7 +26,7 @@ RUN echo "debconf debconf/frontend select Noninteractive" | debconf-set-selectio
     echo "deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti" > /etc/apt/sources.list.d/100-ubnt.list && \
     apt-get update && apt-get install -y mongodb-org tzdata && \
     apt-get install -y curl cron procps net-tools vim mongodb-org && \
-    curl -L http://dl.ubnt.com/unifi/5.4.15/unifi_sysvinit_all.deb -o /tmp/unifi.deb && \
+    curl -L http://dl.ubnt.com/unifi/5.7.23/unifi_sysvinit_all.deb -o /tmp/unifi.deb && \
     dpkg -i /tmp/unifi.deb || /bin/true && apt-get -yf --force-yes install && \
     crontab -l | { cat; echo "0 2 * * * mongo --port 27117 < /bin/mongo_prune_js.js"; } | crontab - && \
     /etc/init.d/unifi start && /etc/init.d/unifi stop && \
